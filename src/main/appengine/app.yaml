@@ -1,0 +1,3 @@
+runtime: java11
+service: consumers-ai
+instance_class: F2
