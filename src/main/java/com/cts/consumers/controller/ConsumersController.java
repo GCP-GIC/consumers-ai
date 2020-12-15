@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cts.consumers.client.RecommendationsClient;
 import com.cts.consumers.entity.ConsumerQuery;
+import com.cts.consumers.model.ConsumerBO;
 import com.cts.consumers.model.ConsumerQueryBO;
 import com.cts.consumers.repo.ConsumerQueryRepository;
 
@@ -61,5 +62,19 @@ public class ConsumersController {
 		consumerQueryBO.setSegments(consumerQuery.getSegments());
 		consumerQueryBO.setMaxBudget(consumerQuery.getMaxBudget());
 		return consumerQueryBO;
-	};
+	}
+	
+	@PostMapping(path = "/sendtorecommendationsai", consumes = "application/json")
+	public ResponseEntity<String> publishConsumerDataToRecommendations(@RequestBody ConsumerBO consumerBO) throws Exception {
+		ConsumerQuery consumerQuery = consumerQueryRepository.findByConsumerID(consumerBO.getConsumerId());
+		if(consumerQuery==null)
+			throw new Exception("Customer id not found");
+		ConsumerQueryBO consumerQueryBO = new ConsumerQueryBO();
+		consumerQueryBO.setBrands(consumerQuery.getBrands());
+		consumerQueryBO.setColors(consumerQuery.getColors());
+		consumerQueryBO.setConsumerId(consumerQuery.getConsumerId());
+		consumerQueryBO.setSegments(consumerQuery.getSegments());
+		consumerQueryBO.setMaxBudget(consumerQuery.getMaxBudget());
+		return recommendationsClient.saveConsumersData(consumerQueryBO);
+	}
 }
